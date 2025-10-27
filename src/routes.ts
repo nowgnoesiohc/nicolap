@@ -1,23 +1,27 @@
-import {
-  type RouteConfig,
-  route,
-  index,
-  layout,
-  prefix,
-}
+import type { RouteObject } from "react-router";
 
-export default [
-  index("./home.tsx"),
-  route("about", "./about.tsx"),
-
-  layout("./auth/layout.tsx", [
-    route("login", "./auth/login.tsx"),
-    route("register", "./auth/register.tsx"),
-  ]),
-
-  ...prefix("concerts", [
-    index("./concerts/home.tsx"),
-    route(":city", "./concerts/city.tsx"),
-    route("trending", "./concerts/trending.tsx"),
-  ]),
-] satisfies RouteConfig;
+// React Router v7 스타일 라우트 설정
+// lazy를 사용하여 코드 스플리팅 자동 적용
+export const routes: RouteObject[] = [
+  {
+    path: "/",
+    lazy: async () => {
+      const Component = await import("@/pages/index");
+      return { Component: Component.default };
+    },
+  },
+  {
+    path: "/login",
+    lazy: async () => {
+      const Component = await import("@/pages/login");
+      return { Component: Component.default };
+    },
+  },
+  {
+    path: "*",
+    lazy: async () => {
+      const Component = await import("@/pages/notfound");
+      return { Component: Component.default };
+    },
+  },
+];
