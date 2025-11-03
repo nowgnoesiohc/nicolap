@@ -1,4 +1,10 @@
 @import "tailwindcss";
+
+/* 전역 border 색상 설정 - shadcn/ui 호환 */
+* {
+  border-color: var(--color-border);
+}
+
 :root {
   --background: oklch(0.9851 0 0);
   --foreground: oklch(0.3485 0 0);

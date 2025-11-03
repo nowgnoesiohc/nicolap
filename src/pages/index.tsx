@@ -1,14 +1,17 @@
 import { useNavigate } from "react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/auth/useAuth";
 import { toast } from "sonner";
+import { ChatModal } from "@/components/ChatModal";
+import { MessageSquare } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
   const { user, loading, signOut } = useAuth();
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // 로그인하지 않은 경우 로그인 페이지로 리다이렉트
   useEffect(() => {
@@ -16,6 +19,19 @@ const Index = () => {
       navigate("/login");
     }
   }, [user, loading, navigate]);
+
+  // 전역 단축키 감지: Cmd/Ctrl + K
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setIsChatOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const handleSignOut = async () => {
     try {
@@ -43,6 +59,8 @@ const Index = () => {
   return (
     <>
       <Toaster />
+      <ChatModal open={isChatOpen} onOpenChange={setIsChatOpen} />
+
       <div className="min-h-screen bg-background">
         <Header />
         <main className="container mx-auto max-w-5xl px-4 py-8">
@@ -58,6 +76,16 @@ const Index = () => {
 
             <div className="mt-8 flex justify-center gap-4">
               <Button
+                onClick={() => setIsChatOpen(true)}
+                className="px-6 py-3 gap-2"
+              >
+                <MessageSquare className="w-4 h-4" />
+                채팅 열기
+                <kbd className="ml-2 px-2 py-0.5 bg-white/20 rounded text-xs">
+                  ⌘K
+                </kbd>
+              </Button>
+              <Button
                 onClick={handleSignOut}
                 variant="outline"
                 className="px-6 py-3"
@@ -66,7 +94,7 @@ const Index = () => {
               </Button>
             </div>
 
-            <div className="mt-8 rounded-lg border p-6">
+            <div className="mt-8 rounded-lg border border-border p-6">
               <h2 className="text-xl font-semibold mb-4">사용자 정보</h2>
               <div className="space-y-2 text-sm">
                 <p>
@@ -80,6 +108,18 @@ const Index = () => {
                   {new Date(user.last_sign_in_at || "").toLocaleString("ko-KR")}
                 </p>
               </div>
+            </div>
+
+            <div className="mt-8 rounded-lg border border-border bg-blue-50 p-6">
+              <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                💡 팁
+              </h3>
+              <p className="text-sm text-gray-600">
+                <kbd className="px-2 py-1 bg-white border rounded text-xs mr-1">
+                  Cmd/Ctrl + K
+                </kbd>
+                를 눌러서 어디서든 채팅 모달을 열 수 있습니다!
+              </p>
             </div>
           </div>
         </main>
